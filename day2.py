@@ -1,0 +1,40 @@
+from helpers import load_input
+
+def is_id_valid(id) -> bool:
+    digits = str(id)
+    if len(digits) % 2 != 0:
+        return True
+
+    halfway_index = len(digits) // 2
+    left = digits[:halfway_index]
+    right = digits[halfway_index:]
+    return right != left     
+
+
+def append_invalid_ids(start, end, invalid_ids_list: list) -> int:
+    invalid_ids_count = 0
+    for id in range(start, end + 1):
+        if not is_id_valid(id):
+            invalid_ids_list.append(id)
+
+    return invalid_ids_count
+
+input = '''11-22,95-115,998-1012,1188511880-1188511890,222220-222224,
+1698522-1698528,446443-446449,38593856-38593862,565653-565659,
+824824821-824824827,2121212118-2121212124'''
+
+
+input = load_input()
+ranges = input.split(',')
+all_invalid_ids = []
+for id_range in ranges:
+    parts = id_range.split('-')
+    start = int(parts[0].strip())
+    end = int(parts[1].strip())
+    append_invalid_ids(start, end, all_invalid_ids)
+
+print (all_invalid_ids)
+invalid_ids_sum = sum(all_invalid_ids)
+print(invalid_ids_sum)
+
+
