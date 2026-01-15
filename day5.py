@@ -4,11 +4,14 @@ class IdRanges:
     def __init__(self):
         self.ranges = []
         self.max_id = -1
+        self.min_id = None
 
     def add_range(self, start: int, end: int):
         self.ranges.append((start,end))
         if end > self.max_id:
             self.max_id = end
+        if self.min_id == None or start < self.min_id:
+            self.min_id = start
 
     def add_range_str(self, id_range: str):
         start, end = id_range.split('-')
@@ -60,7 +63,7 @@ input = load_input()
 
 fresh, ingredients = parse_input(input)
 fresh_count = 0
-for id in range(fresh.max_id + 1):
+for id in range(fresh.min_id, fresh.max_id + 1):
     if id in fresh:
         print(id, "is fresh")
         fresh_count += 1
