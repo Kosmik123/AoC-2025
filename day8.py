@@ -26,5 +26,17 @@ input = '''
 
 #input = load_input()
 lines = input.split('\n')
-print(lines)
 
+points = []
+for line in lines:
+    x_str, y_str, z_str = line.split(',')
+    point = (int(x_str), int(y_str), int(z_str))
+    points.append(point)
+
+print(points)
+
+
+distaneces = {}
+for j in range(0, len(lines) - 1):
+    for i in range(j, len(lines)):
+        pass
