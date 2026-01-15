@@ -1,6 +1,15 @@
 import math
 from helpers import load_input
 
+class PointsDistance:
+    def __init__(self, point1_index: int, point2_index: int, value: float):
+        self.lower_index = min(point1_index, point2_index)
+        self.higher_index = max(point1_index, point2_index)
+        self.value = value
+
+    def __str__(self):
+        return f'[({self.lower_index}, {self.higher_index})] => {self.value}'
+
 def sqr_distance(lhs: tuple[int, int, int], rhs: tuple[int, int, int]) -> int:
     x_diff = lhs[0] - rhs[0]
     y_diff = lhs[1] - rhs[1]
@@ -9,6 +18,10 @@ def sqr_distance(lhs: tuple[int, int, int], rhs: tuple[int, int, int]) -> int:
 
 def distance(lhs: tuple[int, int, int], rhs: tuple[int, int, int]) -> float:
     return math.sqrt(sqr_distance(lhs, rhs))
+
+
+def get_value_from_points_distance(e: PointsDistance):
+    return e.value
 
 
 input = '''
@@ -47,7 +60,6 @@ for line in lines:
 
 print(points)
 
-
 sqr_distances = {}
 for i in range(0, len(lines) - 1):
     point1 = points[i]
@@ -55,6 +67,11 @@ for i in range(0, len(lines) - 1):
         point2 = points[j]
         sqr_distances[(i, j)] = sqr_distance(point1, point2)
 
-for elem in sqr_distances.items():
-    print(elem)
-    
+points_sorted_by_distance: list[PointsDistance] = []
+for points_pair, sqr_dist in sqr_distances.items():
+    points_distance = PointsDistance(points_pair[0], points_pair[1], sqr_dist)
+    points_sorted_by_distance.append(points_distance)
+points_sorted_by_distance.sort(key=get_value_from_points_distance)
+
+for point in points_sorted_by_distance:
+    print(point)
