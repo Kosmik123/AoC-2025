@@ -1,14 +1,5 @@
 from helpers import load_input
 
-class Beam:
-    def __init__(self, column: int, start_row: int, parent: Beam = None):
-        self.column = column
-        self.start_row = start_row
-        self.parent = parent
-
-
-
-
 def add_distinct(list: list, item):
     if item not in list:
         list.append(item)
@@ -38,48 +29,41 @@ input = load_input()
 lines = input.split('\n')
 start_col = lines[0].find('S')
 
-# beams = [start_col]
-# split_count = 0
-# for row in range(len(lines)):
-#     new_beams: list[int] = []
-#     line = lines[row]
-#     for beam_col in beams:
-#         if line[beam_col] == '^':
-#             split_count += 1
-#             print("split at:", row, beam_col)
-#             if beam_col >= 0:
-#                 worlds_count += 1
-#                 add_distinct(new_beams, beam_col - 1) 
-#             if beam_col < len(line) - 1:
-#                 worlds_count += 1
-#                 add_distinct(new_beams, beam_col + 1)
-#         else: 
-#             add_distinct(new_beams, beam_col)
+worlds_per_splitter: dict[(int,int), int] = {}
 
-#     beams = new_beams
 
-# print(split_count)
-# print(worlds_count)
-
-def simulate(beam: Beam) -> int:
-    worlds_count = 0
-    for row in range(beam.start_row, len(lines)):
-        line = lines[row]
-        ch = line[beam.column]
-        if ch == '^':
-            left = Beam(beam.column - 1, row)
-            left.parent = beam
-            right = Beam(beam.column + 1, row)
-            right.parent = beam
-            worlds_count += simulate(left)
-            worlds_count += simulate(right)
-            break
-    else:
-        worlds_count += 1
+def get_worlds_under_position(row: int, col: int):
+    global lines
+    global worlds_per_splitter
+    for i in range(row + 1, len(lines)):
+        if (i, col) in worlds_per_splitter:
+            return worlds_per_splitter[(i, col)]
     
-    return worlds_count
+    return 1
 
 
-starting_beam = Beam(start_col, 0)
-worlds_count = simulate(starting_beam)
-print(worlds_count)
+def calculate_worlds_at_position(row: int, col: int):
+    global lines
+    global worlds_per_splitter
+    line = lines[row]
+    ch = line[col]   
+    if ch != '^':
+        return
+    left_worlds = get_worlds_under_position(row, col - 1)
+    right_worlds = get_worlds_under_position(row, col + 1)
+    worlds_per_splitter[(row, col)] = left_worlds + right_worlds
+
+
+def calculate_worlds_in_row(row: int):
+    global lines
+    for col in range(len(lines[row])):
+        calculate_worlds_at_position(row, col)    
+
+
+for row in range(len(lines) - 1, -1, -1):  
+    calculate_worlds_in_row(row)
+
+#print(worlds_per_splitter)
+
+total_worlds = get_worlds_under_position(0, start_col)
+print(total_worlds)
