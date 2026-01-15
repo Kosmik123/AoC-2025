@@ -1,4 +1,15 @@
+import math
 from helpers import load_input
+
+def sqr_distance(lhs: tuple[int, int, int], rhs: tuple[int, int, int]) -> int:
+    x_diff = lhs[0] - rhs[0]
+    y_diff = lhs[1] - rhs[1]
+    z_diff = lhs[2] - rhs[2]
+    return x_diff ** 2 + y_diff ** 2 + z_diff ** 2
+
+def distance(lhs: tuple[int, int, int], rhs: tuple[int, int, int]) -> float:
+    return math.sqrt(sqr_distance(lhs, rhs))
+
 
 input = '''
 162,817,812
@@ -24,6 +35,7 @@ input = '''
 '''[1:-1]
 
 
+
 #input = load_input()
 lines = input.split('\n')
 
@@ -36,7 +48,13 @@ for line in lines:
 print(points)
 
 
-distaneces = {}
-for j in range(0, len(lines) - 1):
-    for i in range(j, len(lines)):
-        pass
+sqr_distances = {}
+for i in range(0, len(lines) - 1):
+    point1 = points[i]
+    for j in range(i + 1, len(lines)):
+        point2 = points[j]
+        sqr_distances[(i, j)] = sqr_distance(point1, point2)
+
+for elem in sqr_distances.items():
+    print(elem)
+    
