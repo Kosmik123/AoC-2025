@@ -3,10 +3,13 @@ from helpers import load_input
 class IdRanges:
     def __init__(self):
         self.ranges = []
+        self.max_id = -1
 
     def add_range(self, start: int, end: int):
         self.ranges.append((start,end))
-    
+        if end > self.max_id:
+            self.max_id = end
+
     def add_range_str(self, id_range: str):
         start, end = id_range.split('-')
         self.add_range(int(start), int(end))
@@ -57,11 +60,9 @@ input = load_input()
 
 fresh, ingredients = parse_input(input)
 fresh_count = 0
-for ingredient in ingredients:
-    if ingredient in fresh:
-        print(ingredient, "is fresh")
+for id in range(fresh.max_id + 1):
+    if id in fresh:
+        print(id, "is fresh")
         fresh_count += 1
-    else:
-        print(ingredient, "is spoiled")
 
 print(fresh_count)
