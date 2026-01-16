@@ -122,3 +122,5 @@ for pair in junction_pairs_sorted_by_distance:
 
     print(step, circuits)
 
+circuits.sort(key=len, reverse=True)
+print("sorted", circuits)
