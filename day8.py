@@ -95,22 +95,30 @@ def get_circuit_index(junction_index: int) -> int:
 
 step = 0
 for pair in junction_pairs_sorted_by_distance:
+    step += 1
     if step > 10:
         break
     
     if are_points_connected(pair.lower_index, pair.higher_index):
         continue
     
-    circuit_index = get_circuit_index(pair.lower_index)
-    if circuit_index == -1:
-        circuit_index = get_circuit_index(pair.higher_index)
-    if circuit_index == -1:
-        circuit = []
-        circuits.append(circuit)
-    else:
-        circuit = circuits[circuit_index]
-    add_distinct(circuit, pair.lower_index)
-    add_distinct(circuit, pair.higher_index)
-    print(circuits)
-    step += 1
+    circuit1_index = get_circuit_index(pair.lower_index)
+    circuit2_index = get_circuit_index(pair.higher_index)
+
+    if circuit1_index < 0 and circuit2_index < 0:
+        new_circuit = []
+        new_circuit.append(pair.lower_index)
+        new_circuit.append(pair.higher_index)
+        circuits.append(new_circuit)
+    elif circuit1_index < 0 and circuit2_index >= 0:
+        circuits[circuit2_index].append(pair.lower_index)
+    elif circuit1_index >= 0 and circuit2_index < 0:
+        circuits[circuit1_index].append(pair.higher_index)
+    else: # both exist
+        circuit1 = circuits.pop(circuit1_index)
+        circuit2 = circuits.pop(circuit2_index)
+        merged_circuit = circuit1 + circuit2
+        circuits.append(merged_circuit)
+
+    print(step, circuits)
 
