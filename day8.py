@@ -48,6 +48,7 @@ input = '''
 '''[1:-1]
 
 
+STEPS_COUNT = 1000
 input = load_input()
 lines = input.split('\n')
 
@@ -95,7 +96,7 @@ def get_circuit_index(junction_index: int) -> int:
 step = 0
 for pair in junction_pairs_sorted_by_distance:
     step += 1
-    if step > 1000:
+    if step > STEPS_COUNT:
         break
     
     if are_points_connected(pair.lower_index, pair.higher_index):
@@ -128,3 +129,36 @@ three_largest_product = len(circuits[0]) * len(circuits[1]) * len(circuits[2])
 print()
 print(three_largest_product)
 
+
+circuits.clear()
+for pair in junction_pairs_sorted_by_distance:
+    if are_points_connected(pair.lower_index, pair.higher_index):
+        continue
+    
+    circuit1_index = get_circuit_index(pair.lower_index)
+    circuit2_index = get_circuit_index(pair.higher_index)
+
+    if circuit1_index < 0 and circuit2_index < 0:
+        new_circuit = []
+        new_circuit.append(pair.lower_index)
+        new_circuit.append(pair.higher_index)
+        circuits.append(new_circuit)
+    elif circuit1_index < 0 and circuit2_index >= 0:
+        circuits[circuit2_index].append(pair.lower_index)
+    elif circuit1_index >= 0 and circuit2_index < 0:
+        circuits[circuit1_index].append(pair.higher_index)
+    else: # both exist
+        circuit2 = circuits.pop(max(circuit1_index, circuit2_index))
+        circuit1 = circuits.pop(min(circuit1_index, circuit2_index))
+        merged_circuit = circuit1 + circuit2
+        circuits.append(merged_circuit)
+
+    if len(circuits) == 1 and len(circuits[0]) == len(junctions):
+        finishing_junction1 = junctions[pair.lower_index]
+        finishing_junction2 = junctions[pair.higher_index]
+        x1 = finishing_junction1[0]
+        x2 = finishing_junction2[0]
+        print (x1, '*', x2, '=', x1 * x2)
+        break
+
+print()
