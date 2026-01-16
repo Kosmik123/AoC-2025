@@ -48,8 +48,7 @@ input = '''
 '''[1:-1]
 
 
-
-#input = load_input()
+input = load_input()
 lines = input.split('\n')
 
 junctions = []
@@ -73,8 +72,8 @@ for junction_pair, sqr_dist in sqr_distances.items():
     junction_pairs_sorted_by_distance.append(junctions_distance)
 junction_pairs_sorted_by_distance.sort(key=get_value_from_junctions_distance)
 
-for pair in junction_pairs_sorted_by_distance:
-    print(pair)
+#for pair in junction_pairs_sorted_by_distance:
+ #   print(pair)
 
 
 circuits: list[list[int]] = []
@@ -96,7 +95,7 @@ def get_circuit_index(junction_index: int) -> int:
 step = 0
 for pair in junction_pairs_sorted_by_distance:
     step += 1
-    if step > 10:
+    if step > 1000:
         break
     
     if are_points_connected(pair.lower_index, pair.higher_index):
@@ -115,12 +114,17 @@ for pair in junction_pairs_sorted_by_distance:
     elif circuit1_index >= 0 and circuit2_index < 0:
         circuits[circuit1_index].append(pair.higher_index)
     else: # both exist
-        circuit1 = circuits.pop(circuit1_index)
-        circuit2 = circuits.pop(circuit2_index)
+        circuit2 = circuits.pop(max(circuit1_index, circuit2_index))
+        circuit1 = circuits.pop(min(circuit1_index, circuit2_index))
         merged_circuit = circuit1 + circuit2
         circuits.append(merged_circuit)
 
-    print(step, circuits)
+    #print(step, circuits)
 
 circuits.sort(key=len, reverse=True)
 print("sorted", circuits)
+
+three_largest_product = len(circuits[0]) * len(circuits[1]) * len(circuits[2]) 
+print()
+print(three_largest_product)
+
