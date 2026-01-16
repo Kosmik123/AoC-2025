@@ -7,3 +7,8 @@ def load_input() -> str:
     with open(filename, 'r') as file:
         data = file.read()
     return data         
+
+
+def add_distinct(list: list, item):
+    if item not in list:
+        list.append(item)

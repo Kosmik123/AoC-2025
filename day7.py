@@ -1,9 +1,5 @@
 from helpers import load_input
 
-def add_distinct(list: list, item):
-    if item not in list:
-        list.append(item)
-
 
 input = '''
 .......S.......
