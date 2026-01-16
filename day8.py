@@ -1,10 +1,10 @@
 import math
-from helpers import load_input
+from helpers import load_input, add_distinct
 
-class PointsDistance:
-    def __init__(self, point1_index: int, point2_index: int, value: float):
-        self.lower_index = min(point1_index, point2_index)
-        self.higher_index = max(point1_index, point2_index)
+class JunctionssDistance:
+    def __init__(self, junction1_index: int, junction2_index: int, value: float):
+        self.lower_index = min(junction1_index, junction2_index)
+        self.higher_index = max(junction1_index, junction2_index)
         self.value = value
 
     def __str__(self):
@@ -20,7 +20,7 @@ def distance(lhs: tuple[int, int, int], rhs: tuple[int, int, int]) -> float:
     return math.sqrt(sqr_distance(lhs, rhs))
 
 
-def get_value_from_points_distance(e: PointsDistance):
+def get_value_from_junctions_distance(e: JunctionssDistance):
     return e.value
 
 
@@ -52,26 +52,65 @@ input = '''
 #input = load_input()
 lines = input.split('\n')
 
-points = []
+junctions = []
 for line in lines:
     x_str, y_str, z_str = line.split(',')
-    point = (int(x_str), int(y_str), int(z_str))
-    points.append(point)
+    pair = (int(x_str), int(y_str), int(z_str))
+    junctions.append(pair)
 
-print(points)
+print(junctions)
 
 sqr_distances = {}
 for i in range(0, len(lines) - 1):
-    point1 = points[i]
+    junction1 = junctions[i]
     for j in range(i + 1, len(lines)):
-        point2 = points[j]
-        sqr_distances[(i, j)] = sqr_distance(point1, point2)
+        junction2 = junctions[j]
+        sqr_distances[(i, j)] = sqr_distance(junction1, junction2)
 
-points_sorted_by_distance: list[PointsDistance] = []
-for points_pair, sqr_dist in sqr_distances.items():
-    points_distance = PointsDistance(points_pair[0], points_pair[1], sqr_dist)
-    points_sorted_by_distance.append(points_distance)
-points_sorted_by_distance.sort(key=get_value_from_points_distance)
+junction_pairs_sorted_by_distance: list[JunctionssDistance] = []
+for junction_pair, sqr_dist in sqr_distances.items():
+    junctions_distance = JunctionssDistance(junction_pair[0], junction_pair[1], sqr_dist)
+    junction_pairs_sorted_by_distance.append(junctions_distance)
+junction_pairs_sorted_by_distance.sort(key=get_value_from_junctions_distance)
 
-for point in points_sorted_by_distance:
-    print(point)
+for pair in junction_pairs_sorted_by_distance:
+    print(pair)
+
+
+circuits: list[list[int]] = []
+def are_points_connected(point1_index: int, point2_index: int) -> bool:
+    global circuits
+    for circuit in circuits:
+        if point1_index in circuit and point2_index in circuit:
+            return True
+    return False
+
+def get_circuit_index(junction_index: int) -> int:
+    global circuits
+    for i in range(len(circuits)):
+        if junction_index in circuits[i]:
+            return i
+    return -1
+
+
+step = 0
+for pair in junction_pairs_sorted_by_distance:
+    if step > 10:
+        break
+    
+    if are_points_connected(pair.lower_index, pair.higher_index):
+        continue
+    
+    circuit_index = get_circuit_index(pair.lower_index)
+    if circuit_index == -1:
+        circuit_index = get_circuit_index(pair.higher_index)
+    if circuit_index == -1:
+        circuit = []
+        circuits.append(circuit)
+    else:
+        circuit = circuits[circuit_index]
+    add_distinct(circuit, pair.lower_index)
+    add_distinct(circuit, pair.higher_index)
+    print(circuits)
+    step += 1
+
