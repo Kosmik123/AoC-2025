@@ -1,5 +1,5 @@
 import math
-from helpers import load_input, add_distinct
+from helpers import load_input, Point
 
 class JunctionssDistance:
     def __init__(self, junction1_index: int, junction2_index: int, value: float):
@@ -10,13 +10,15 @@ class JunctionssDistance:
     def __str__(self):
         return f'[({self.lower_index}, {self.higher_index})] => {self.value}'
 
-def sqr_distance(lhs: tuple[int, int, int], rhs: tuple[int, int, int]) -> int:
-    x_diff = lhs[0] - rhs[0]
-    y_diff = lhs[1] - rhs[1]
-    z_diff = lhs[2] - rhs[2]
+
+def sqr_distance(lhs: Point, rhs: Point) -> int:
+    x_diff = lhs.x - rhs.x
+    y_diff = lhs.y - rhs.y
+    z_diff = lhs.z- rhs.z
     return x_diff ** 2 + y_diff ** 2 + z_diff ** 2
 
-def distance(lhs: tuple[int, int, int], rhs: tuple[int, int, int]) -> float:
+
+def distance(lhs: Point, rhs: Point) -> float:
     return math.sqrt(sqr_distance(lhs, rhs))
 
 
@@ -52,11 +54,11 @@ STEPS_COUNT = 1000
 input = load_input()
 lines = input.split('\n')
 
-junctions = []
+junctions: list[Point] = []
 for line in lines:
     x_str, y_str, z_str = line.split(',')
-    pair = (int(x_str), int(y_str), int(z_str))
-    junctions.append(pair)
+    junction = Point(int(x_str), int(y_str), int(z_str))
+    junctions.append(junction)
 
 print(junctions)
 
@@ -94,26 +96,26 @@ def get_circuit_index(junction_index: int) -> int:
 
 
 step = 0
-for pair in junction_pairs_sorted_by_distance:
+for junction in junction_pairs_sorted_by_distance:
     step += 1
     if step > STEPS_COUNT:
         break
     
-    if are_points_connected(pair.lower_index, pair.higher_index):
+    if are_points_connected(junction.lower_index, junction.higher_index):
         continue
     
-    circuit1_index = get_circuit_index(pair.lower_index)
-    circuit2_index = get_circuit_index(pair.higher_index)
+    circuit1_index = get_circuit_index(junction.lower_index)
+    circuit2_index = get_circuit_index(junction.higher_index)
 
     if circuit1_index < 0 and circuit2_index < 0:
         new_circuit = []
-        new_circuit.append(pair.lower_index)
-        new_circuit.append(pair.higher_index)
+        new_circuit.append(junction.lower_index)
+        new_circuit.append(junction.higher_index)
         circuits.append(new_circuit)
     elif circuit1_index < 0 and circuit2_index >= 0:
-        circuits[circuit2_index].append(pair.lower_index)
+        circuits[circuit2_index].append(junction.lower_index)
     elif circuit1_index >= 0 and circuit2_index < 0:
-        circuits[circuit1_index].append(pair.higher_index)
+        circuits[circuit1_index].append(junction.higher_index)
     else: # both exist
         circuit2 = circuits.pop(max(circuit1_index, circuit2_index))
         circuit1 = circuits.pop(min(circuit1_index, circuit2_index))
@@ -131,22 +133,22 @@ print(three_largest_product)
 
 
 circuits.clear()
-for pair in junction_pairs_sorted_by_distance:
-    if are_points_connected(pair.lower_index, pair.higher_index):
+for junction in junction_pairs_sorted_by_distance:
+    if are_points_connected(junction.lower_index, junction.higher_index):
         continue
     
-    circuit1_index = get_circuit_index(pair.lower_index)
-    circuit2_index = get_circuit_index(pair.higher_index)
+    circuit1_index = get_circuit_index(junction.lower_index)
+    circuit2_index = get_circuit_index(junction.higher_index)
 
     if circuit1_index < 0 and circuit2_index < 0:
         new_circuit = []
-        new_circuit.append(pair.lower_index)
-        new_circuit.append(pair.higher_index)
+        new_circuit.append(junction.lower_index)
+        new_circuit.append(junction.higher_index)
         circuits.append(new_circuit)
     elif circuit1_index < 0 and circuit2_index >= 0:
-        circuits[circuit2_index].append(pair.lower_index)
+        circuits[circuit2_index].append(junction.lower_index)
     elif circuit1_index >= 0 and circuit2_index < 0:
-        circuits[circuit1_index].append(pair.higher_index)
+        circuits[circuit1_index].append(junction.higher_index)
     else: # both exist
         circuit2 = circuits.pop(max(circuit1_index, circuit2_index))
         circuit1 = circuits.pop(min(circuit1_index, circuit2_index))
@@ -154,10 +156,10 @@ for pair in junction_pairs_sorted_by_distance:
         circuits.append(merged_circuit)
 
     if len(circuits) == 1 and len(circuits[0]) == len(junctions):
-        finishing_junction1 = junctions[pair.lower_index]
-        finishing_junction2 = junctions[pair.higher_index]
-        x1 = finishing_junction1[0]
-        x2 = finishing_junction2[0]
+        finishing_junction1 = junctions[junction.lower_index]
+        finishing_junction2 = junctions[junction.higher_index]
+        x1 = finishing_junction1.x
+        x2 = finishing_junction2.x
         print (x1, '*', x2, '=', x1 * x2)
         break
 

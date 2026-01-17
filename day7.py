@@ -1,4 +1,4 @@
-from helpers import load_input
+from helpers import load_input, Point
 
 
 input = '''
@@ -25,15 +25,16 @@ input = load_input()
 lines = input.split('\n')
 start_col = lines[0].find('S')
 
-worlds_per_splitter: dict[(int,int), int] = {}
+worlds_per_splitter: dict[Point, int] = {}
 
 
 def get_worlds_under_position(row: int, col: int):
     global lines
     global worlds_per_splitter
     for i in range(row + 1, len(lines)):
-        if (i, col) in worlds_per_splitter:
-            return worlds_per_splitter[(i, col)]
+        splitter = Point(i, col)
+        if splitter in worlds_per_splitter:
+            return worlds_per_splitter[splitter]
     
     return 1
 
@@ -47,7 +48,7 @@ def calculate_worlds_at_position(row: int, col: int):
         return
     left_worlds = get_worlds_under_position(row, col - 1)
     right_worlds = get_worlds_under_position(row, col + 1)
-    worlds_per_splitter[(row, col)] = left_worlds + right_worlds
+    worlds_per_splitter[Point(row, col)] = left_worlds + right_worlds
 
 
 def calculate_worlds_in_row(row: int):
