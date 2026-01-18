@@ -135,6 +135,8 @@ print()
 def compare_lists(lhs: list, rhs: list):
     if len(lhs) != len(rhs):
         return False
+    if sum(lhs) != sum(rhs):
+        return False
     for i in range(len(lhs)):
         if lhs[i] != rhs[i]:
             return False
@@ -150,9 +152,9 @@ def calculate_joltage_press_count(requirement: list[int], available_buttons: lis
     return None 
 
 
-def apply_joltage_button_effect(effect: set[int], joltages: list[int]):
+def apply_joltage_button_effect(effect: set[int], joltages: list[int], amount: int = 1):
     for i in effect:
-        joltages[i] += 1
+        joltages[i] += amount
 
 
 def print_button_presses(presses: list[int]):
@@ -176,8 +178,7 @@ def test_joltage_button_presses(available_buttons: list[set[int]], requirement: 
             if press_count <= 0:
                  continue
             effect = available_buttons[button_index]
-            for _ in range(press_count):
-                apply_joltage_button_effect(effect, test_list)
+            apply_joltage_button_effect(effect, test_list, press_count)
 
         #print ("Resulting joltages:", test_list)
         #print()
@@ -203,7 +204,7 @@ for machine_index in range(machine_count):
     print(f"For machine {machine_index} ", end='')
     count = calculate_joltage_press_count(required_joltages, available_buttons)
     if count == None:
-        print("no solution!")
+        print("No solution!")
     required_joltage_press_counts_per_machine.append(count)
 
 print()
