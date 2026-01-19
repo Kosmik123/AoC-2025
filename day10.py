@@ -1,5 +1,5 @@
 import sys
-from helpers import load_input
+from helpers import load_input, compare_sets
 
 required_lights_per_machine: list[set[int]] = []
 buttons_per_machine: list[list[set[int]]] = []
@@ -75,16 +75,6 @@ assert len(required_lights_per_machine) == len(buttons_per_machine) == len(jolta
 machine_count = len(buttons_per_machine)
 
 # LIGHTS
-def compare_sets(lhs: set, rhs: set) -> bool:
-    for item in lhs:
-        if not item in rhs: 
-            return False
-    for item in rhs:
-        if not item in lhs: 
-            return False
-    return True
-
-
 def apply_light_button_effect(effect: set[int], lights: set[int]):
     for light_index in effect:
         if light_index in lights:

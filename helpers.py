@@ -14,8 +14,20 @@ def add_distinct(list: list, item):
         list.append(item)
 
 
+def compare_sets(lhs: set, rhs: set) -> bool:
+    if len(lhs) != len(rhs):
+        return False
+    for item in lhs:
+        if not item in rhs: 
+            return False
+    for item in rhs:
+        if not item in lhs: 
+            return False
+    return True
+
+
 class Point:
-    def __init__(self, x: int, y: int, z: int = 0):
+    def __init__(self, x: int, y: int, z: int = None):
         self.x = x
         self.y = y
         self.z = z
@@ -28,3 +40,6 @@ class Point:
     
     def __hash__(self):
         return hash((self.x, self.y, self.y))
+    
+
+
