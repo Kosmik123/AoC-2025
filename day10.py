@@ -65,10 +65,8 @@ input = '''
 [.###.#] (0,1,2,3,4) (0,3,4) (0,1,2,4,5) (1,2) {10,11,11,5,10,5}
 '''[1:-1]
 
-
 input = load_input()
 lines = input.split('\n')
-
 
 for line in lines:
     parse_line(line)
@@ -108,8 +106,7 @@ def test_light_button_presses(available_buttons: list[set[int]], requirement: se
         pressed_buttons.add(button)
         if test_light_button_presses(available_buttons, requirement, pressed_buttons, button + 1, remaining_press_count - 1):
             return True    
-        pressed_buttons.remove(button)
-    
+        pressed_buttons.remove(button)   
     return False
 
 
@@ -130,73 +127,43 @@ print("Need", sum(required_light_press_counts_per_machine), "presses to light up
 print()
 
 
+# JOLTAGES
 import pulp
 
-# machine 0
-joltages = joltages_per_machine[0]
-buttons = buttons_per_machine[0]
-button_variables = list[pulp.LpVariable]()
-for bi in range(len(buttons)):
-    bv = pulp.LpVariable(f'b{bi}', lowBound=0, cat=pulp.LpInteger)
-    button_variables.append(bv)
-
-problem = pulp.LpProblem('day10', pulp.LpMinimize)
-minimized_expr = pulp.LpAffineExpression(pulp.lpSum(button_variables))
-problem += minimized_expr
-for index in range(len(joltages)):
-    buttons_in_expr = list[int]()
+def solve_machine(machine_index: int):
+    joltages = joltages_per_machine[machine_index]
+    buttons = buttons_per_machine[machine_index]
+    button_variables = list[pulp.LpVariable]()
     for bi in range(len(buttons)):
-        if index in buttons[bi]:
-            buttons_in_expr.append(bi)
+        bv = pulp.LpVariable(f'b{bi}', lowBound=0, cat=pulp.LpInteger)
+        button_variables.append(bv)
 
-    constraint = pulp.lpSum(button_variables[i] for i in buttons_in_expr) == joltages[index]
-    problem += constraint
+    problem = pulp.LpProblem('', pulp.LpMinimize)
+    minimized_expr = pulp.LpAffineExpression(pulp.lpSum(button_variables))
+    problem += minimized_expr
+    for index in range(len(joltages)):
+        buttons_in_expr = list[int]()
+        for bi in range(len(buttons)):
+            if index in buttons[bi]:
+                buttons_in_expr.append(bi)
 
-status = problem.solve()
-for var in problem.variables():
-    print(var, "=", pulp.value(var))
+        constraint = pulp.lpSum(button_variables[i] for i in buttons_in_expr) == joltages[index]
+        problem += constraint
 
+    status = problem.solve(pulp.PULP_CBC_CMD(msg=0))
+    var_sum = sum(pulp.value(var) for var in problem.variables())
+    return var_sum
 
+total_sum = 0
+for mi in range(machine_count):
+    print (mi, "/", machine_count)
+    total_sum += solve_machine(mi)
 
-''' [.##.] (3) (1,3) (2) (2,3) (0,2) (0,1) {3,5,4,7} '''
-
-# from expressions import Expression, Equation, solve
-
-# lhs = Expression({"x1": 2, "x3": 1})
-# rhs = Expression(value=44, unknowns={"x2": 3})
-# eq  = Equation(lhs, rhs)
-# print(eq)
-
-# expr_for_x1 = eq.get_expression("x1")
-# print("x1 =", expr_for_x1)
-
-# equations: list[Equation] = []
-# for index in range(len(joltages)):
-#     lhs_terms: dict[str, int] = {}
-#     rhs = Expression(value=joltages[index])
-#     for bi in range(len(buttons)):
-#         if index in buttons[bi]:
-#             var_name = f"b{bi}"
-#             lhs_terms[var_name] = 1
-#     lhs = Expression(lhs_terms)
-#     eq = Equation(lhs, rhs)
-#     equations.append(eq)
-
-# print()
-# for eq in equations:
-#     print(eq)
-
-# remaining_equations = equations.copy()
-
-# print()
-# solve(equations)
-
-
-
+print()
+print(int(total_sum))
 
 exit()
 
-# JOLTAGES
 def compare_lists(lhs: list, rhs: list):
     if len(lhs) != len(rhs):
         return False
