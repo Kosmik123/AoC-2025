@@ -24,6 +24,27 @@ class Expression:
                 result += f'({term})'
         return result
 
+    def multiply(self, mult: int):
+        for term in self.terms:
+            self.terms[term] = mult * self.terms[term]  
+
+    def add(self, rhs: Expression):
+        for var, coeff in rhs.terms.items():
+            if var in self.terms:
+                self.terms[var] += coeff
+            else: 
+                self.terms[var] = coeff
+
+    def substitute(self, variable: str, substitution: Expression):
+        if variable not in self.terms:
+            return
+        expr_copy = Expression(substitution.terms)
+        expr_copy.multiply(self.terms[variable])
+        self.terms.pop(variable)
+        self.add(expr_copy)
+
+
+
 class Equation:
     def __init__(self, lhs: Expression, rhs: Expression):
         self.lhs = lhs
@@ -32,25 +53,25 @@ class Equation:
     def __str__(self):
         return f"{self.lhs} = {self.rhs}"
 
-    def get_expression(self, unknown: str) -> Expression:
-        if not unknown in self.lhs and not unknown in self.rhs:
+    def get_expression(self, variable: str) -> Expression:
+        if not variable in self.lhs and not variable in self.rhs:
             return None
          
         rhs_terms: dict[str, int] = {}
         lhs_coeff = 0
-        if unknown in self.lhs:
-            lhs_coeff += self.lhs.terms[unknown]
+        if variable in self.lhs:
+            lhs_coeff += self.lhs.terms[variable]
         
         for other, coeff in self.lhs.terms.items():
-            if other == unknown:
+            if other == variable:
                 continue
             rhs_terms[other] = -coeff     
         
-        if unknown in self.rhs:
-            lhs_coeff -= self.rhs.terms[unknown]
+        if variable in self.rhs:
+            lhs_coeff -= self.rhs.terms[variable]
             
         for other, coeff in self.rhs.terms.items():
-            if other == unknown:
+            if other == variable:
                 continue
             if other in rhs_terms:
                 rhs_terms[other] += coeff     
@@ -63,3 +84,15 @@ class Equation:
         
         return Expression(rhs_terms)
 
+
+
+def solve(equations: list[Equation]) -> dict[str, Expression]:
+    variables = set[str]()
+    for eq in equations:
+        for var_name in eq.lhs.terms:
+            if var_name != '':
+                variables.add(var_name)
+        for var_name in eq.rhs.terms:
+            if var_name != '':
+                variables.add(var_name)
+    print(variables)

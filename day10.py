@@ -130,6 +130,71 @@ print("Need", sum(required_light_press_counts_per_machine), "presses to light up
 print()
 
 
+import pulp
+
+# machine 0
+joltages = joltages_per_machine[0]
+buttons = buttons_per_machine[0]
+button_variables = list[pulp.LpVariable]()
+for bi in range(len(buttons)):
+    bv = pulp.LpVariable(f'b{bi}', lowBound=0, cat=pulp.LpInteger)
+    button_variables.append(bv)
+
+problem = pulp.LpProblem('day10', pulp.LpMinimize)
+minimized_expr = pulp.LpAffineExpression(pulp.lpSum(button_variables))
+problem += minimized_expr
+for index in range(len(joltages)):
+    buttons_in_expr = list[int]()
+    for bi in range(len(buttons)):
+        if index in buttons[bi]:
+            buttons_in_expr.append(bi)
+
+    constraint = pulp.lpSum(button_variables[i] for i in buttons_in_expr) == joltages[index]
+    problem += constraint
+
+status = problem.solve()
+for var in problem.variables():
+    print(var, "=", pulp.value(var))
+
+
+
+''' [.##.] (3) (1,3) (2) (2,3) (0,2) (0,1) {3,5,4,7} '''
+
+# from expressions import Expression, Equation, solve
+
+# lhs = Expression({"x1": 2, "x3": 1})
+# rhs = Expression(value=44, unknowns={"x2": 3})
+# eq  = Equation(lhs, rhs)
+# print(eq)
+
+# expr_for_x1 = eq.get_expression("x1")
+# print("x1 =", expr_for_x1)
+
+# equations: list[Equation] = []
+# for index in range(len(joltages)):
+#     lhs_terms: dict[str, int] = {}
+#     rhs = Expression(value=joltages[index])
+#     for bi in range(len(buttons)):
+#         if index in buttons[bi]:
+#             var_name = f"b{bi}"
+#             lhs_terms[var_name] = 1
+#     lhs = Expression(lhs_terms)
+#     eq = Equation(lhs, rhs)
+#     equations.append(eq)
+
+# print()
+# for eq in equations:
+#     print(eq)
+
+# remaining_equations = equations.copy()
+
+# print()
+# solve(equations)
+
+
+
+
+exit()
 
 # JOLTAGES
 def compare_lists(lhs: list, rhs: list):
