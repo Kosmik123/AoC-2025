@@ -56,7 +56,9 @@ class PresentShapeVariant:
 
 class PresentShape:
     def __init__(self, shape: str):
-        self.variants = PresentShape.create_all_variants(PresentShapeVariant.from_string(shape))
+        base_variant: PresentShapeVariant = PresentShapeVariant.from_string(shape)
+        self.variants = PresentShape.create_all_variants(base_variant)
+        self.size = len(base_variant.occupied)
 
     def create_all_variants(shape: PresentShapeVariant) -> set[PresentShapeVariant]:
         variants = set[PresentShapeVariant]()
@@ -112,7 +114,7 @@ input = '''
 
 
 
-present_shapes = list[str]()
+present_shapes = list[PresentShape]()
 
 regions = list[tuple[int, int]]()
 required_present_counts = list[list[int]]()
@@ -122,7 +124,7 @@ def parse_presents(present_sections: list[str]):
     global present_shapes
     for section in present_sections:
         index, shape = section.split(':\n')
-        present_shapes.append(shape)
+        present_shapes.append(PresentShape(shape))
 
 def parse_regions(regions_section: str):
     global regions, required_present_counts
@@ -146,11 +148,32 @@ def parse_input(input: str):
 
 parse_input(input)
 
-test_shape_str = present_shapes[5]
-test_shape = PresentShape(test_shape_str)
+# test_shape_str = present_shapes[5]
+# test_shape = PresentShape(test_shape_str)
 
-for v in test_shape.variants:
-    print(v, '\n')
+# for v in test_shape.variants:
+#     print(v, '\n')
 
 
+regions_count = len(regions)
+assert regions_count == len(required_present_counts)
 
+
+fittable_count = 0
+for r in range(regions_count):
+    region = regions[r]
+    area = region[0] * region[1]
+
+    requirement = required_present_counts[r]
+    total_coverage = 0
+    for i in range(len(present_shapes)):
+        amount = requirement[i]
+        present_size = present_shapes[i].size
+        total_coverage += present_size * amount
+
+    print (area, "vs", total_coverage, ", can fit?:", area > total_coverage)
+    if area > total_coverage:
+        fittable_count += 1
+
+print()
+print(fittable_count)
