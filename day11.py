@@ -1,16 +1,19 @@
 from helpers import load_input
 
 input = '''
-aaa: you hhh
-you: bbb ccc
-bbb: ddd eee
-ccc: ddd eee fff
-ddd: ggg
-eee: out
-fff: out
+svr: aaa bbb
+aaa: fft
+fft: ccc
+bbb: tty
+tty: ccc
+ccc: ddd eee
+ddd: hub
+hub: fff
+eee: dac
+dac: fff
+fff: ggg hhh
 ggg: out
-hhh: ccc fff iii
-iii: out
+hhh: out
 '''[1:-1]
 
 
@@ -48,23 +51,38 @@ ptree('you', outputs_by_device)
 
 
 
-ways_to_out_by_device = dict[str, int]()
-def get_ways_to_out(device: str):
-    global ways_to_out_by_device, outputs_by_device 
-    if device in ways_to_out_by_device:
-        return ways_to_out_by_device[device] 
+ways_to_destination = dict[(str, str), int]()
+def get_ways_to_out(in_device: str, out_device: str = 'out'):
+    if in_device == 'out':
+        return 0
+    
+    global ways_to_destination, outputs_by_device 
+
+    key = (in_device, out_device) 
+    if key in ways_to_destination:
+        return ways_to_destination[key] 
 
     ways_count = 0
-    device_outs = outputs_by_device[device]
+    device_outs = outputs_by_device[in_device]
     for output in device_outs:
-        if output == 'out':
+        if output == out_device:
             ways_count += 1
         else: 
-            ways_count += get_ways_to_out(output)
+            ways_count += get_ways_to_out(output, out_device)
     
-    ways_to_out_by_device[device] = ways_count
+    ways_to_destination[key] = ways_count
     return ways_count
 
-ways_from_you = get_ways_to_out('you')
+ways_from_you = get_ways_to_out('svr', 'fft')
 print(ways_from_you)
 
+svr_to_fft = get_ways_to_out('svr', 'fft')
+fft_to_dac = get_ways_to_out('fft', 'dac')
+dac_to_out = get_ways_to_out('dac', 'out')
+
+svr_to_dac = get_ways_to_out('svr', 'dac')
+dac_to_fft = get_ways_to_out('dac', 'fft')
+fft_to_out= get_ways_to_out('fft', 'out')
+
+total = svr_to_fft * fft_to_dac * dac_to_out + svr_to_dac * dac_to_fft * fft_to_out
+print(total)
