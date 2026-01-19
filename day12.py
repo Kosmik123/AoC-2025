@@ -148,13 +148,6 @@ def parse_input(input: str):
 
 parse_input(input)
 
-# test_shape_str = present_shapes[5]
-# test_shape = PresentShape(test_shape_str)
-
-# for v in test_shape.variants:
-#     print(v, '\n')
-
-
 regions_count = len(regions)
 assert regions_count == len(required_present_counts)
 
