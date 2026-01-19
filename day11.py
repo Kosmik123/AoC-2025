@@ -79,10 +79,14 @@ print(ways_from_you)
 svr_to_fft = get_ways_to_out('svr', 'fft')
 fft_to_dac = get_ways_to_out('fft', 'dac')
 dac_to_out = get_ways_to_out('dac', 'out')
+svr_to_fft_to_dac_to_out = svr_to_fft * fft_to_dac * dac_to_out
 
 svr_to_dac = get_ways_to_out('svr', 'dac')
 dac_to_fft = get_ways_to_out('dac', 'fft')
 fft_to_out= get_ways_to_out('fft', 'out')
+svr_to_dac_to_fft_to_out = svr_to_dac * dac_to_fft * fft_to_out
+print ("fft first:", svr_to_fft_to_dac_to_out)
+print ("dac first:", svr_to_dac_to_fft_to_out)
 
-total = svr_to_fft * fft_to_dac * dac_to_out + svr_to_dac * dac_to_fft * fft_to_out
+total = svr_to_dac_to_fft_to_out + svr_to_fft_to_dac_to_out 
 print(total)
